@@ -15,8 +15,8 @@ bool bInitialized = false;
 float	ENBTime = 12.0f;
 float	ENBCameraPosition[3] = { 0.0f, 0.0f, 0.0f };
 float	ENBWeatherTransition = 0.0f;
-DWORD	ENBWeatherCurrent = 0;
-DWORD	ENBWeatherOutgoing = 0;
+Hash    ENBWeatherCurrent = 0;
+Hash    ENBWeatherOutgoing = 0;
 float	ENBWindSpeed = 0.0f;
 float	ENBWindDirection[3] = {0.0f, 0.0f, 0.0f };
 float	ENBRainAmount = 0.0f;
@@ -169,31 +169,30 @@ void	update()
 	}
 
 	//+++ wind
-	{
-		float	windspeed = 0.0f;
-		float windspeed = MISC::GET_WIND_SPEED();
-		ENBWindSpeed = windspeed;
-		if (ENBWindSpeed < 0.0f) ENBWindSpeed = 0.0f;
-		if (ENBWindSpeed > 10000.0f) ENBWindSpeed = 10000.0f;
-		Vector3 winddir = MISC::GET_WIND_DIRECTION();
-		ENBWindDirection[0] = winddir.x;
-		ENBWindDirection[1] = winddir.y;
-		ENBWindDirection[2] = winddir.z;
-	}
+        {
+                float windspeed = MISC::GET_WIND_SPEED();
+                ENBWindSpeed = windspeed;
+                if (ENBWindSpeed < 0.0f) ENBWindSpeed = 0.0f;
+                if (ENBWindSpeed > 10000.0f) ENBWindSpeed = 10000.0f;
+                Vector3 winddir = MISC::GET_WIND_DIRECTION();
+                ENBWindDirection[0] = winddir.x;
+                ENBWindDirection[1] = winddir.y;
+                ENBWindDirection[2] = winddir.z;
+        }
+
 
 	//+++ rain and snow
 	{
-		DWORD	rain = 0;
-		DWORD	snow = 0;
-		float rain = MISC::GET_RAIN_LEVEL();
-		memcpy(&ENBRainAmount, &rain, 4);
-		if (ENBRainAmount < 0.0f) ENBRainAmount = 0.0f;
-		if (ENBRainAmount > 1.0f) ENBRainAmount = 1.0f;
-		float snow = MISC::GET_SNOW_LEVEL();
-		memcpy(&ENBSnowAmount, &snow, 4);
-		if (ENBSnowAmount < 0.0f) ENBSnowAmount = 0.0f;
-		if (ENBSnowAmount > 1.0f) ENBSnowAmount = 1.0f;
-	}
+              float rain = MISC::GET_RAIN_LEVEL();
+              ENBRainAmount = rain;
+              if (ENBRainAmount < 0.0f) ENBRainAmount = 0.0f;
+              if (ENBRainAmount > 1.0f) ENBRainAmount = 1.0f;
+
+              float snow = MISC::GET_SNOW_LEVEL();
+              ENBSnowAmount = snow;
+              if (ENBSnowAmount < 0.0f) ENBSnowAmount = 0.0f;
+              if (ENBSnowAmount > 1.0f) ENBSnowAmount = 1.0f;
+        }
 
 	//+++ interior
 	{
@@ -207,13 +206,11 @@ void	update()
 	//	if (TRUE == IS_GAMEPLAY_CAM_RENDERING())
 	//	if (TRUE == DOES_CAM_EXIST(camera))
 	{
-		//	Vector3	cameraposition = GET_GAMEPLAY_CAM_COORD(); //not work at moment camera move from top to bottom at hospital spawn
-		Vector3 camerarotation = CAM::GET_GAMEPLAY_CAM_ROT(0);
-		ENBCameraPosition[0] = cameraposition.x;
-		ENBCameraPosition[1] = cameraposition.y;
-		ENBCameraPosition[2] = cameraposition.z;
-		//Vector3	camerarotation = GET_GAMEPLAY_CAM_ROT();
-	}
+        Vector3 cameraposition = CAM::GET_GAMEPLAY_CAM_COORD();
+        ENBCameraPosition[0] = cameraposition.x;
+        ENBCameraPosition[1] = cameraposition.y;
+        ENBCameraPosition[2] = cameraposition.z;
+        }
 
 	//light like this for transparent objects only, so it's useless
 //	Vector3	lightpos = GET_GAMEPLAY_CAM_COORDS();
