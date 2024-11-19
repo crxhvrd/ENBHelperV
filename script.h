@@ -7,7 +7,7 @@
 
 #include "inc\main.h"
 
-#include "..\enbhelper.h"
+#include "enbhelper.h"
 
 #ifndef __cplusplus
 #define EEXPORT				_declspec(dllexport)
