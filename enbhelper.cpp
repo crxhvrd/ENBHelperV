@@ -12,16 +12,16 @@ bool bInitialized = false;
 //------------------------------------------------------------------------------------------------
 
 
-float	ENBTime = 12.0f;
-float	ENBCameraPosition[3] = { 0.0f, 0.0f, 0.0f };
-float	ENBWeatherTransition = 0.0f;
-Hash    ENBWeatherCurrent = 0;
-Hash    ENBWeatherOutgoing = 0;
-float	ENBWindSpeed = 0.0f;
-float	ENBWindDirection[3] = {0.0f, 0.0f, 0.0f };
-float	ENBRainAmount = 0.0f;
-float	ENBSnowAmount = 0.0f;
-BOOL	ENBIsInterior = FALSE;
+float	g_Time = 12.0f;
+float	g_CameraPosition[3] = { 0.0f, 0.0f, 0.0f };
+float	g_WeatherTransition = 0.0f;
+DWORD   g_WeatherCurrent = 0;
+DWORD   g_WeatherOutgoing = 0;
+float	g_WindSpeed = 0.0f;
+float	g_WindDirection[3] = {0.0f, 0.0f, 0.0f };
+float	g_RainAmount = 0.0f;
+float	g_SnowAmount = 0.0f;
+BOOL	g_IsInterior = FALSE;
 
 //------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------
@@ -29,68 +29,68 @@ BOOL	ENBIsInterior = FALSE;
 
 EEXPORT bool HELPER_API GetTime(float& time)
 {
-	time = ENBTime;
+	time = g_Time;
 	return true;
 }
 
 EEXPORT bool HELPER_API GetWeatherTransition(float& t)
 {
-	t = ENBWeatherTransition;
+	t = g_WeatherTransition;
 	return true;
 }
 
 EEXPORT bool HELPER_API GetCurrentWeather(DWORD& id)
 {
-	id = ENBWeatherCurrent;
+	id = g_WeatherCurrent;
 	return true;
 }
 
 EEXPORT bool HELPER_API GetOutgoingWeather(DWORD& id)
 {
-	id = ENBWeatherOutgoing;
+	id = g_WeatherOutgoing;
 	return true;
 }
 
 EEXPORT bool HELPER_API GetWindSpeed(float& s)
 {
-	s = ENBWindSpeed;
+	s = g_WindSpeed;
 	return true;
 }
 
 EEXPORT bool HELPER_API GetWindDirection(float *d)
 {
 	if (!d) return false;
-	//memcpy(d, ENBWindDirection, 3 * sizeof(float));
-	d[0] = ENBWindDirection[0];
-	d[1] = ENBWindDirection[1];
-	d[2] = ENBWindDirection[2];
+	//memcpy(d, g_WindDirection, 3 * sizeof(float));
+	d[0] = g_WindDirection[0];
+	d[1] = g_WindDirection[1];
+	d[2] = g_WindDirection[2];
 	return true;
 }
 
 EEXPORT bool HELPER_API GetRainAmount(float& s)
 {
-	s = ENBRainAmount;
+	s = g_RainAmount;
 	return true;
 }
 
 EEXPORT bool HELPER_API GetSnowAmount(float& s)
 {
-	s = ENBSnowAmount;
+	s = g_SnowAmount;
 	return true;
 }
 
 EEXPORT bool HELPER_API IsInterior(BOOL& i)
 {
-	i = ENBIsInterior;
+	i = g_IsInterior;
 	return true;
 }
 
 EEXPORT bool HELPER_API GetCameraPosition(float *p)
 {
 	if (!p) return false;
-	p[0] = ENBCameraPosition[0];
-	p[1] = ENBCameraPosition[1];
-	p[2] = ENBCameraPosition[2];
+	p[0] = g_CameraPosition[0];
+	p[1] = g_CameraPosition[1];
+	p[2] = g_CameraPosition[2];
 	return true;
 }
 
@@ -149,9 +149,9 @@ void	update()
 		float h = static_cast<float>(CLOCK::GET_CLOCK_HOURS());
                 float m = static_cast<float>(CLOCK::GET_CLOCK_MINUTES());
                 float s = static_cast<float>(CLOCK::GET_CLOCK_SECONDS());
-		ENBTime = h + (m / 60.0f) + (s / (60.0f*60.0f));
-		if (ENBTime < 0.0f) ENBTime = 0.0f;
-		if (ENBTime >= 24.0f) ENBTime = 0.0f;
+		g_Time = h + (m / 60.0f) + (s / (60.0f*60.0f));
+		if (g_Time < 0.0f) g_Time = 0.0f;
+		if (g_Time >= 24.0f) g_Time = 0.0f;
 	}
 
 	//+++ weather
@@ -161,43 +161,43 @@ void	update()
 		float	weathertransition = 0.0f;
 	//	SET_CURR_WEATHER_STATE(weathercurrent, weathernext, 0.5f);
 		MISC::GET_CURR_WEATHER_STATE(&weathercurrent, &weathernext, &weathertransition);
-		ENBWeatherCurrent = weathernext;
-		ENBWeatherOutgoing = weathercurrent;
-		ENBWeatherTransition = weathertransition;
-		if (ENBWeatherTransition < 0.0f) ENBWeatherTransition = 0.0f;
-		if (ENBWeatherTransition > 1.0f) ENBWeatherTransition = 1.0f;
+		g_WeatherCurrent = weathernext;
+		g_WeatherOutgoing = weathercurrent;
+		g_WeatherTransition = weathertransition;
+		if (g_WeatherTransition < 0.0f) g_WeatherTransition = 0.0f;
+		if (g_WeatherTransition > 1.0f) g_WeatherTransition = 1.0f;
 	}
 
 	//+++ wind
         {
                 float windspeed = MISC::GET_WIND_SPEED();
-                ENBWindSpeed = windspeed;
-                if (ENBWindSpeed < 0.0f) ENBWindSpeed = 0.0f;
-                if (ENBWindSpeed > 10000.0f) ENBWindSpeed = 10000.0f;
+                g_WindSpeed = windspeed;
+                if (g_WindSpeed < 0.0f) g_WindSpeed = 0.0f;
+                if (g_WindSpeed > 10000.0f) g_WindSpeed = 10000.0f;
                 Vector3 winddir = MISC::GET_WIND_DIRECTION();
-                ENBWindDirection[0] = winddir.x;
-                ENBWindDirection[1] = winddir.y;
-                ENBWindDirection[2] = winddir.z;
+                g_WindDirection[0] = winddir.x;
+                g_WindDirection[1] = winddir.y;
+                g_WindDirection[2] = winddir.z;
         }
 
 
 	//+++ rain and snow
 	{
               float rain = MISC::GET_RAIN_LEVEL();
-              ENBRainAmount = rain;
-              if (ENBRainAmount < 0.0f) ENBRainAmount = 0.0f;
-              if (ENBRainAmount > 1.0f) ENBRainAmount = 1.0f;
+              g_RainAmount = rain;
+              if (g_RainAmount < 0.0f) g_RainAmount = 0.0f;
+              if (g_RainAmount > 1.0f) g_RainAmount = 1.0f;
 
               float snow = MISC::GET_SNOW_LEVEL();
-              ENBSnowAmount = snow;
-              if (ENBSnowAmount < 0.0f) ENBSnowAmount = 0.0f;
-              if (ENBSnowAmount > 1.0f) ENBSnowAmount = 1.0f;
+              g_SnowAmount = snow;
+              if (g_SnowAmount < 0.0f) g_SnowAmount = 0.0f;
+              if (g_SnowAmount > 1.0f) g_SnowAmount = 1.0f;
         }
 
 	//+++ interior
 	{
 		//useless, just few places have this, Michael house don't have (but underground do have)
-		ENBIsInterior = INTERIOR::IS_INTERIOR_SCENE();
+		g_IsInterior = INTERIOR::IS_INTERIOR_SCENE();
 	}
 
 	//+++ camera
@@ -207,9 +207,9 @@ void	update()
 	//	if (TRUE == DOES_CAM_EXIST(camera))
 	{
         Vector3 cameraposition = CAM::GET_GAMEPLAY_CAM_COORD();
-        ENBCameraPosition[0] = cameraposition.x;
-        ENBCameraPosition[1] = cameraposition.y;
-        ENBCameraPosition[2] = cameraposition.z;
+        g_CameraPosition[0] = cameraposition.x;
+        g_CameraPosition[1] = cameraposition.y;
+        g_CameraPosition[2] = cameraposition.z;
         }
 
 	//light like this for transparent objects only, so it's useless
@@ -246,7 +246,7 @@ void	update()
 	}*/
 	//don't work too for detecting interiors purely, far from precise
 //	Vector3	lightpos = GET_GAMEPLAY_CAM_COORDS();
-//	ENBIsInterior = GET_INTERIOR_AT_COORDS(lightpos.x, lightpos.y, lightpos.z);
+//	g_IsInterior = GET_INTERIOR_AT_COORDS(lightpos.x, lightpos.y, lightpos.z);
 }
 
 
