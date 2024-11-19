@@ -146,9 +146,9 @@ void	update()
 {
 	//+++ time
 	{
-		float	h = (float)(GET_CLOCK_HOURS());
-		float	m = (float)(GET_CLOCK_MINUTES());
-		float	s = (float)(GET_CLOCK_SECONDS());
+		float h = static_cast<float>(CLOCK::GET_CLOCK_HOURS());
+                float m = static_cast<float>(CLOCK::GET_CLOCK_MINUTES());
+                float s = static_cast<float>(CLOCK::GET_CLOCK_SECONDS());
 		ENBTime = h + (m / 60.0f) + (s / (60.0f*60.0f));
 		if (ENBTime < 0.0f) ENBTime = 0.0f;
 		if (ENBTime >= 24.0f) ENBTime = 0.0f;
@@ -156,11 +156,11 @@ void	update()
 
 	//+++ weather
 	{
-		DWORD	weathercurrent = GET_PREV_WEATHER_TYPE_HASH_NAME();
-		DWORD	weathernext = GET_NEXT_WEATHER_TYPE_HASH_NAME();
+		Hash weathercurrent = MISC::GET_PREV_WEATHER_TYPE_HASH_NAME();
+                Hash weathernext = MISC::GET_NEXT_WEATHER_TYPE_HASH_NAME();
 		float	weathertransition = 0.0f;
 	//	SET_CURR_WEATHER_STATE(weathercurrent, weathernext, 0.5f);
-		GET_CURR_WEATHER_STATE(&weathercurrent, &weathernext, &weathertransition);
+		MISC::GET_CURR_WEATHER_STATE(&weathercurrent, &weathernext, &weathertransition);
 		ENBWeatherCurrent = weathernext;
 		ENBWeatherOutgoing = weathercurrent;
 		ENBWeatherTransition = weathertransition;
@@ -171,11 +171,11 @@ void	update()
 	//+++ wind
 	{
 		float	windspeed = 0.0f;
-		windspeed = GET_WIND_SPEED();
+		float windspeed = MISC::GET_WIND_SPEED();
 		ENBWindSpeed = windspeed;
 		if (ENBWindSpeed < 0.0f) ENBWindSpeed = 0.0f;
 		if (ENBWindSpeed > 10000.0f) ENBWindSpeed = 10000.0f;
-		Vector3	winddir = GET_WIND_DIRECTION();
+		Vector3 winddir = MISC::GET_WIND_DIRECTION();
 		ENBWindDirection[0] = winddir.x;
 		ENBWindDirection[1] = winddir.y;
 		ENBWindDirection[2] = winddir.z;
@@ -185,11 +185,11 @@ void	update()
 	{
 		DWORD	rain = 0;
 		DWORD	snow = 0;
-		rain = GET_RAIN_LEVEL();
+		float rain = MISC::GET_RAIN_LEVEL();
 		memcpy(&ENBRainAmount, &rain, 4);
 		if (ENBRainAmount < 0.0f) ENBRainAmount = 0.0f;
 		if (ENBRainAmount > 1.0f) ENBRainAmount = 1.0f;
-		snow = GET_SNOW_LEVEL();
+		float snow = MISC::GET_SNOW_LEVEL();
 		memcpy(&ENBSnowAmount, &snow, 4);
 		if (ENBSnowAmount < 0.0f) ENBSnowAmount = 0.0f;
 		if (ENBSnowAmount > 1.0f) ENBSnowAmount = 1.0f;
@@ -198,7 +198,7 @@ void	update()
 	//+++ interior
 	{
 		//useless, just few places have this, Michael house don't have (but underground do have)
-		ENBIsInterior = IS_INTERIOR_SCENE();
+		ENBIsInterior = INTERIOR::IS_INTERIOR_SCENE();
 	}
 
 	//+++ camera
@@ -208,7 +208,7 @@ void	update()
 	//	if (TRUE == DOES_CAM_EXIST(camera))
 	{
 		//	Vector3	cameraposition = GET_GAMEPLAY_CAM_COORD(); //not work at moment camera move from top to bottom at hospital spawn
-		Vector3	cameraposition = GET_GAMEPLAY_CAM_COORDS();
+		Vector3 camerarotation = CAM::GET_GAMEPLAY_CAM_ROT(0);
 		ENBCameraPosition[0] = cameraposition.x;
 		ENBCameraPosition[1] = cameraposition.y;
 		ENBCameraPosition[2] = cameraposition.z;
