@@ -3,6 +3,7 @@
 //------------------------------------------------------------------------------------------------
 
 #define HELPER_COMPILATION
+#include "enbhelper.h"
 #include "script.h"
 #include <stdio.h>
 
