@@ -156,8 +156,8 @@ void	update()
 
 	//+++ weather
 	{
-		Hash weathercurrent = MISC::GET_PREV_WEATHER_TYPE_HASH_NAME();
-                Hash weathernext = MISC::GET_NEXT_WEATHER_TYPE_HASH_NAME();
+		DWORD weathercurrent = MISC::GET_PREV_WEATHER_TYPE_HASH_NAME();
+                DWORD weathernext = MISC::GET_NEXT_WEATHER_TYPE_HASH_NAME();
 		float	weathertransition = 0.0f;
 	//	SET_CURR_WEATHER_STATE(weathercurrent, weathernext, 0.5f);
 		MISC::GET_CURR_WEATHER_STATE(&weathercurrent, &weathernext, &weathertransition);
