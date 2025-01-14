@@ -19,7 +19,7 @@ float	g_WeatherTransition = 0.0f;
 DWORD   g_WeatherCurrent = 0;
 DWORD   g_WeatherOutgoing = 0;
 float	g_WindSpeed = 0.0f;
-float	g_WindDirection[3] = {0.0f, 0.0f, 0.0f };
+float	g_WindDirection[3] = { 0.0f, 0.0f, 0.0f };
 float	g_RainAmount = 0.0f;
 float	g_SnowAmount = 0.0f;
 BOOL	g_IsInterior = FALSE;
@@ -58,7 +58,7 @@ EEXPORT bool HELPER_API GetWindSpeed(float& s)
 	return true;
 }
 
-EEXPORT bool HELPER_API GetWindDirection(float *d)
+EEXPORT bool HELPER_API GetWindDirection(float* d)
 {
 	if (!d) return false;
 	//memcpy(d, g_WindDirection, 3 * sizeof(float));
@@ -86,7 +86,7 @@ EEXPORT bool HELPER_API IsInterior(BOOL& i)
 	return true;
 }
 
-EEXPORT bool HELPER_API GetCameraPosition(float *p)
+EEXPORT bool HELPER_API GetCameraPosition(float* p)
 {
 	if (!p) return false;
 	p[0] = g_CameraPosition[0];
@@ -147,53 +147,64 @@ void	update()
 {
 	//+++ time
 	{
-		float h = static_cast<float>(CLOCK::GET_CLOCK_HOURS());
-                float m = static_cast<float>(CLOCK::GET_CLOCK_MINUTES());
-                float s = static_cast<float>(CLOCK::GET_CLOCK_SECONDS());
-		g_Time = h + (m / 60.0f) + (s / (60.0f*60.0f));
+		float h = static_cast<float>(TIME::GET_CLOCK_HOURS());
+		float m = static_cast<float>(TIME::GET_CLOCK_MINUTES());
+		float s = static_cast<float>(TIME::GET_CLOCK_SECONDS());
+		g_Time = h + (m / 60.0f) + (s / (60.0f * 60.0f));
 		if (g_Time < 0.0f) g_Time = 0.0f;
 		if (g_Time >= 24.0f) g_Time = 0.0f;
 	}
 
-	//+++ weather
 	{
-		DWORD weathercurrent = MISC::GET_PREV_WEATHER_TYPE_HASH_NAME();
-                DWORD weathernext = MISC::GET_NEXT_WEATHER_TYPE_HASH_NAME();
-		float	weathertransition = 0.0f;
-	//	SET_CURR_WEATHER_STATE(weathercurrent, weathernext, 0.5f);
-		MISC::GET_CURR_WEATHER_STATE(&weathercurrent, &weathernext, &weathertransition);
+		DWORD weathercurrent;
+		DWORD weathernext;
+		float weathertransition;
+
+		weathercurrent = GAMEPLAY::_GET_CURRENT_WEATHER_TYPE();
+		weathernext = GAMEPLAY::_GET_NEXT_WEATHER_TYPE();
+		GAMEPLAY::_GET_WEATHER_TYPE_TRANSITION(&weathercurrent, &weathernext, &weathertransition);
+
+		// Correctly use the native SET_WEATHER_TYPE_NOW
+		char weatherType[] = "EXTRASUNNY" "CLEAR" "CLEARING" "SMOG" "FOGGY" "CLOUDS" "RAIN" "OVERCAST" "THUNDER" "BLIZZARD" "NEUTRAL" "XMAS" "SNOWLIGHT" "SNOW" "XMAS" "HALLOWEEN";
+		GAMEPLAY::SET_WEATHER_TYPE_NOW(weatherType);
+		
+
+		// Update global variables
 		g_WeatherCurrent = weathernext;
 		g_WeatherOutgoing = weathercurrent;
 		g_WeatherTransition = weathertransition;
+
+		// Ensure transition value is within valid bounds
 		if (g_WeatherTransition < 0.0f) g_WeatherTransition = 0.0f;
 		if (g_WeatherTransition > 1.0f) g_WeatherTransition = 1.0f;
 	}
 
+
 	//+++ wind
-        {
-                float windspeed = MISC::GET_WIND_SPEED();
-                g_WindSpeed = windspeed;
-                if (g_WindSpeed < 0.0f) g_WindSpeed = 0.0f;
-                if (g_WindSpeed > 10000.0f) g_WindSpeed = 10000.0f;
-                Vector3 winddir = MISC::GET_WIND_DIRECTION();
-                g_WindDirection[0] = winddir.x;
-                g_WindDirection[1] = winddir.y;
-                g_WindDirection[2] = winddir.z;
-        }
+	{
+		float windspeed = GAMEPLAY::GET_WIND_SPEED();
+		g_WindSpeed = windspeed;
+		if (g_WindSpeed < 0.0f) g_WindSpeed = 0.0f;
+		if (g_WindSpeed > 10000.0f) g_WindSpeed = 10000.0f;
+		Vector3 winddir = GAMEPLAY::GET_WIND_DIRECTION();
+		g_WindDirection[0] = winddir.x;
+		g_WindDirection[1] = winddir.y;
+		g_WindDirection[2] = winddir.z;
+	}
 
 
 	//+++ rain and snow
 	{
-              float rain = MISC::GET_RAIN_LEVEL();
-              g_RainAmount = rain;
-              if (g_RainAmount < 0.0f) g_RainAmount = 0.0f;
-              if (g_RainAmount > 1.0f) g_RainAmount = 1.0f;
+		float rain = GAMEPLAY::GET_RAIN_LEVEL();
+		g_RainAmount = rain;
+		if (g_RainAmount < 0.0f) g_RainAmount = 0.0f;
+		if (g_RainAmount > 1.0f) g_RainAmount = 1.0f;
 
-              float snow = MISC::GET_SNOW_LEVEL();
-              g_SnowAmount = snow;
-              if (g_SnowAmount < 0.0f) g_SnowAmount = 0.0f;
-              if (g_SnowAmount > 1.0f) g_SnowAmount = 1.0f;
-        }
+		float snow = GAMEPLAY::GET_SNOW_LEVEL();
+		g_SnowAmount = snow;
+		if (g_SnowAmount < 0.0f) g_SnowAmount = 0.0f;
+		if (g_SnowAmount > 1.0f) g_SnowAmount = 1.0f;
+	}
 
 	//+++ interior
 	{
@@ -202,16 +213,16 @@ void	update()
 	}
 
 	//+++ camera
-	//Cam	camera = GET_RENDERING_CAM();
-	//	Cam	camera = GET_RENDERING_CAM();
-	//	if (TRUE == IS_GAMEPLAY_CAM_RENDERING())
-	//	if (TRUE == DOES_CAM_EXIST(camera))
 	{
-        Vector3 cameraposition = CAM::GET_GAMEPLAY_CAM_COORD();
-        g_CameraPosition[0] = cameraposition.x;
-        g_CameraPosition[1] = cameraposition.y;
-        g_CameraPosition[2] = cameraposition.z;
-        }
+		Cam activeCam = CAM::GET_RENDERING_CAM();
+		if (CAM::DOES_CAM_EXIST(activeCam))
+		{
+			Vector3 cameraposition = CAM::GET_CAM_COORD(activeCam);
+			g_CameraPosition[0] = cameraposition.x;
+			g_CameraPosition[1] = cameraposition.y;
+			g_CameraPosition[2] = cameraposition.z;
+		}
+	}
 
 	//light like this for transparent objects only, so it's useless
 //	Vector3	lightpos = GET_GAMEPLAY_CAM_COORDS();
@@ -232,22 +243,22 @@ void	update()
 			fclose(file);
 		}
 	}*/
-/*	Vector3	lightpos = GET_GAMEPLAY_CAM_COORDS();
-	int	zone = GET_ZONE_AT_COORDS(lightpos.x, lightpos.y, lightpos.z);
-	//Hash	zh = GET_HASH_OF_MAP_AREA_AT_COORDS(lightpos.x, lightpos.y, lightpos.z);
-	{
-		FILE	*file = fopen("__temp.txt", "at");
-		if (file)
+	/*	Vector3	lightpos = GET_GAMEPLAY_CAM_COORDS();
+		int	zone = GET_ZONE_AT_COORDS(lightpos.x, lightpos.y, lightpos.z);
+		//Hash	zh = GET_HASH_OF_MAP_AREA_AT_COORDS(lightpos.x, lightpos.y, lightpos.z);
 		{
-			fseek(file, 0, SEEK_END);
-			//fprintf(file, "%08X \n", zh);
-			fprintf(file, "%08X \n", zone);
-			fclose(file);
-		}
-	}*/
-	//don't work too for detecting interiors purely, far from precise
-//	Vector3	lightpos = GET_GAMEPLAY_CAM_COORDS();
-//	g_IsInterior = GET_INTERIOR_AT_COORDS(lightpos.x, lightpos.y, lightpos.z);
+			FILE	*file = fopen("__temp.txt", "at");
+			if (file)
+			{
+				fseek(file, 0, SEEK_END);
+				//fprintf(file, "%08X \n", zh);
+				fprintf(file, "%08X \n", zone);
+				fclose(file);
+			}
+		}*/
+		//don't work too for detecting interiors purely, far from precise
+	//	Vector3	lightpos = GET_GAMEPLAY_CAM_COORDS();
+	//	g_IsInterior = GET_INTERIOR_AT_COORDS(lightpos.x, lightpos.y, lightpos.z);
 }
 
 
